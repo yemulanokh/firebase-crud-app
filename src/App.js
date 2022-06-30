@@ -1,73 +1,83 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { useState,useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import './App.css';
 import { db } from './firebase-config';
-import {collection, getDocs, addDoc, updateDoc, doc,deleteDoc} from 'firebase/firestore';
-import { async } from '@firebase/util';
+import { collection, getDocs, addDoc, updateDoc, doc, deleteDoc } from 'firebase/firestore';
+import { Table, TableBody, TableRow, TableHead, TableCell } from '@mui/material';
+import { FormControl, FormGroup, InputLabel, Input, Typography, Button, styled } from '@mui/material'
+
+const styledForm = styled(FormGroup)`
+  width: 50%
+  margin: 50px auto 0 auto;
+  `
 
 function App() {
   const [newName, setNewName] = useState('');
   const [newAge, setNewAge] = useState(0);
-  const [users, setUsers]= useState([]);
-  const usersCollectionRef = collection(db,"users");
+  const [users, setUsers] = useState([]);
+  const usersCollectionRef = collection(db, "users");
 
   const createUser = async () => {
-    await addDoc(usersCollectionRef, {name: newName , age: Number(newAge)})
+    await addDoc(usersCollectionRef, { name: newName, age: Number(newAge) })
 
-  } 
+  }
 
-  const updateUser = async (id, age) => { 
-    const userDoc = doc(db,"users",id);
-    const newFields = {age: age + 1};
-    await updateDoc(userDoc,newFields);
+  const updateUser = async (id, age) => {
+    const userDoc = doc(db, "users", id);
+    const newFields = { age: age + 1 };
+    await updateDoc(userDoc, newFields);
   }
 
   const deleteUser = async (id) => {
     const userDoc = doc(db, "users", id);
     await deleteDoc(userDoc);
   }
-  useEffect ( ()=> {
+  useEffect(() => {
     const getUsers = async () => {
       const data = await getDocs(usersCollectionRef);
-      setUsers(data.docs.map((doc) => ({...doc.data(), id: doc.id})));
+      setUsers(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
     }
     getUsers();
-  },[]);
+  }, []);
   return (
     <div className="App">
-      <table>
-        <tr>
-          <td>Name :</td>
-          <td>
-             <input placeholder='Enter Name' onChange={(e) => {setNewName(e.target.value)}}/>
-            </td>
-          </tr>
-        <tr>
-          <td>Age :</td>
-        <td>
-      <input type="number" placeholder='Enter age' onChange={(e) => {setNewAge(e.target.value)}}/>
-      </td>
-      </tr>
-      <tr>
-      <td>
-      <button onClick={createUser}>Create user</button>
-      </td>
-      </tr>
-      </table>
-      
-      {users.map((user) =>{
-        return (
+      <div className='container'>
+        <styledForm>
+          <Typography>Add User</Typography>
+          <FormControl>
 
-        <div>
-          {/* {" "} */}
-          <h1>Name: {user.name}</h1>
-          <h1>Age: {user.age}</h1>
-          <button onClick={() => {updateUser(user.id, user.age)}}>increase age</button>
-          <button onClick={() => {deleteUser(user.id)}}>Delete User</button>
-        </div>);
+            <Input placeholder='Enter Name' onChange={(e) => { setNewName(e.target.value) }} />
+          </FormControl>
+          <FormControl>
 
-      })}
-        
+            <Input type="number" placeholder='Enter age' onChange={(e) => { setNewAge(e.target.value) }} />
+          </FormControl>
+          <FormControl>
+            <Button onClick={createUser} variant='contained'>Create user</Button>
+          </FormControl>
+        </styledForm>
+
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Name</TableCell>
+              <TableCell>Age</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {
+              users.map((user) => (
+                <TableRow>
+                  <TableCell>{user.name}</TableCell>
+                  <TableCell>{user.age}</TableCell>
+                  <TableCell><Button onClick={() => { updateUser(user.id, user.age) }} variant='contained' style={{ margin: 10 }} color='info'>increase age</Button>
+                    <Button onClick={() => { deleteUser(user.id) }} variant='contained' color='error'>Delete User</Button></TableCell>
+                </TableRow>
+              ))
+            }
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
 }
