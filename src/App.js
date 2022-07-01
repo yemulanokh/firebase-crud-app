@@ -4,7 +4,7 @@ import './App.css';
 import { db } from './firebase-config';
 import { collection, getDocs, addDoc, updateDoc, doc, deleteDoc } from 'firebase/firestore';
 import { Table, TableBody, TableRow, TableHead, TableCell } from '@mui/material';
-import { FormControl, FormGroup, InputLabel, Input, Typography, Button, styled } from '@mui/material'
+import { FormControl, FormGroup, Input, Typography, Button, styled } from '@mui/material'
 
 const styledForm = styled(FormGroup)`
   width: 50%
